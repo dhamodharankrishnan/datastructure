@@ -21,6 +21,15 @@
         </fileset>
         <pathelement path="${build.dir}"/>
     </path>
+	
+	 <path id="test-classpath">
+	        <fileset dir="${web.dir}/WEB-INF/lib">
+	            <include name="*.jar"/>
+	        </fileset>
+	        <pathelement path="${build.dir}"/>
+	        <pathelement path="${test.dir}"/>
+	        <pathelement path="${web.dir}/WEB-INF/classes"/>
+	    </path>
 
     <target name="usage">
         <echo message=""/>
@@ -37,6 +46,11 @@
         <echo message="start     --> Start Tomcat application"/>
         <echo message="stop      --> Stop Tomcat application"/>
         <echo message="list      --> List Tomcat applications"/>
+        <echo message="createStudentTables   --> Create Student table"/>
+        <echo message="dropStudentTables  --> Drop  Student table"/>
+        <echo message="loadStudentData --> Laod Student Table "/>
+        <echo message="printStudentData --> Print Student Table"/>
+        <echo message="clearStudentData --> Clear Student Table"/>
         <echo message=""/>
     </target>
 
@@ -107,13 +121,21 @@
     <taskdef name="stop" classname="org.apache.catalina.ant.StopTask">
         <classpath refid="catalina-ant-classpath"/>
     </taskdef>
-
+<!--
+    <target name="undeploy" description="Un-Deploy application">
+        <delete>
+            <fileset dir="${deploy.path}/${name}">
+                <include name="**/*.*"/>
+            </fileset>
+        </delete>
+    </target>	
+-->	
     <target name="undeploy" description="Undeploy war application from Tomcat">
         <catalina-undeploy url="${tomcat.manager.url}"
                  username="${tomcat.manager.username}"
                  password="${tomcat.manager.password}"
                  path="/${name}"
-                 war="${name}"/>
+                 />
     </target>
 
     <target name="install" description="Install application in Tomcat">
@@ -170,12 +192,17 @@
 	            haltonfailure="false"
 	            failureproperty="tests.failed"
 	            showoutput="true">
+	        	<classpath refid="test-classpath"/>
 	            <classpath refid="master-classpath"/>
 	            <formatter type="brief" usefile="false"/>
 	            
 	            <batchtest>
 	                <fileset dir="${build.dir}">
-	                    <include name="**/*Tests.*"/>
+	                	<include name="**/*JdbcProductDaoTests.*"/>
+	                	<!--
+	                	<include name="**/*Tests.*"/>
+	                	<exclude name="**/Jdbc*Tests.*"/> 
+	                	-->
 	                </fileset>
 	            </batchtest>
 	            
@@ -190,6 +217,190 @@
 	            ***********************************************************
 	        </fail>
 	    </target>
-	<!--End of test case targets -->
 	
+	<target name="dbTests" depends="build, buildtests,dropTables,createTables,loadData" 
+	            description="Run db tests">
+	        <junit printsummary="on"
+	            fork="false"
+	            haltonfailure="false"
+	            failureproperty="tests.failed"
+	            showoutput="true">
+	            <classpath refid="test-classpath"/>
+	            <formatter type="brief" usefile="false"/>
+	            
+	            <batchtest>
+	                <fileset dir="${build.dir}">
+	                    <include name="**/Jdbc*Tests.*"/>
+	                </fileset>
+	            </batchtest>
+	            
+	        </junit>
+	        
+	        <fail if="tests.failed">
+	            tests.failed=${tests.failed}
+	            ***********************************************************
+	            ***********************************************************
+	            ****  One or more tests failed!  Check the output ...  ****
+	            ***********************************************************
+	            ***********************************************************
+	        </fail>
+	    </target>	
+	<!--End of test case targets -->
+	<target name="clean" description="Clean output directories">
+	        <delete>
+	            <fileset dir="${build.dir}">
+	                <include name="**/*.class"/>
+	            </fileset>
+	        </delete>
+	    </target>
+
+	<!-- Database targets -->
+	<target name="createTables">
+	        <echo message="CREATE TABLES USING: ${db.driver} ${db.url}"/>
+	        <sql driver="${db.driver}"
+	             url="${db.url}"
+	             userid="${db.user}"
+	             password="${db.pw}"
+	             onerror="continue"
+	             src="db/create_products.sql">  
+	            <classpath refid="master-classpath"/>
+	        </sql> 
+	    </target>
+
+	    <target name="dropTables">
+	        <echo message="DROP TABLES USING: ${db.driver} ${db.url}"/>
+	        <sql driver="${db.driver}"
+	             url="${db.url}"
+	             userid="${db.user}"
+	             password="${db.pw}"
+	             onerror="continue">  
+	            <classpath refid="master-classpath"/>
+
+	        DROP TABLE products;
+
+	        </sql> 
+	    </target>
+
+	    <target name="loadData">
+	        <echo message="LOAD DATA USING: ${db.driver} ${db.url}"/>
+	        <sql driver="${db.driver}"
+	             url="${db.url}"
+	             userid="${db.user}"
+	             password="${db.pw}"
+	             onerror="continue"
+	             src="db/load_data.sql">  
+	            <classpath refid="master-classpath"/>
+	        </sql> 
+	    </target>
+
+	    <target name="printData">
+	        <echo message="PRINT DATA USING: ${db.driver} ${db.url}"/>
+	        <sql driver="${db.driver}"
+	             url="${db.url}"
+	             userid="${db.user}"
+	             password="${db.pw}"
+	             onerror="continue"
+	             print="true">  
+	            <classpath refid="master-classpath"/>
+
+	        SELECT * FROM products;
+
+	        </sql> 
+	    </target>
+
+	    <target name="clearData">
+	        <echo message="CLEAR DATA USING: ${db.driver} ${db.url}"/>
+	        <sql driver="${db.driver}"
+	             url="${db.url}"
+	             userid="${db.user}"
+	             password="${db.pw}"
+	             onerror="continue">  
+	            <classpath refid="master-classpath"/>
+
+	        DELETE FROM products;
+
+	        </sql> 
+	    </target>
+
+	    <target name="shutdownDb">
+	        <echo message="SHUT DOWN DATABASE USING: ${db.driver} ${db.url}"/>
+	        <sql driver="${db.driver}"
+	             url="${db.url}"
+	             userid="${db.user}"
+	             password="${db.pw}"
+	             onerror="continue">  
+	            <classpath refid="master-classpath"/>
+
+	        SHUTDOWN;
+
+	        </sql> 
+	    </target>
+	
+	<target name="createStudentTables">
+	        <echo message="CREATE TABLES USING: ${db.driver} ${db.url}"/>
+	        <sql driver="${db.driver}"
+	             url="${db.url}"
+	             userid="${db.user}"
+	             password="${db.pw}"
+	             onerror="continue"
+	             src="db/create_students.sql">  
+	            <classpath refid="master-classpath"/>
+	        </sql> 
+	    </target>
+
+	    <target name="dropStudentTables">
+	        <echo message="DROP TABLES USING: ${db.driver} ${db.url}"/>
+	        <sql driver="${db.driver}"
+	             url="${db.url}"
+	             userid="${db.user}"
+	             password="${db.pw}"
+	             onerror="continue">  
+	            <classpath refid="master-classpath"/>
+
+	        DROP TABLE STUDENT_INFO;
+
+	        </sql> 
+	    </target>
+
+	    <target name="loadStudentData">
+	        <echo message="LOAD DATA USING: ${db.driver} ${db.url}"/>
+	        <sql driver="${db.driver}"
+	             url="${db.url}"
+	             userid="${db.user}"
+	             password="${db.pw}"
+	             onerror="continue"
+	             src="db/load_student_data.sql">  
+	            <classpath refid="master-classpath"/>
+	        </sql> 
+	    </target>
+
+	    <target name="printStudentData">
+	        <echo message="PRINT DATA USING: ${db.driver} ${db.url}"/>
+	        <sql driver="${db.driver}"
+	             url="${db.url}"
+	             userid="${db.user}"
+	             password="${db.pw}"
+	             onerror="continue"
+	             print="true">  
+	            <classpath refid="master-classpath"/>
+
+	        SELECT * FROM STUDENT_INFO;
+
+	        </sql> 
+	    </target>
+
+	    <target name="clearStudentData">
+	        <echo message="CLEAR DATA USING: ${db.driver} ${db.url}"/>
+	        <sql driver="${db.driver}"
+	             url="${db.url}"
+	             userid="${db.user}"
+	             password="${db.pw}"
+	             onerror="continue">  
+	            <classpath refid="master-classpath"/>
+
+	        DELETE FROM STUDENT_INFO;
+
+	        </sql> 
+	    </target>
+
 </project>
