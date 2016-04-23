@@ -81,4 +81,7 @@
 	<bean name="/studentlist.htm" class="springapp.web.StudentListFormController">
 		<property name="studentManager" ref="dbStudentManager" />
 	</bean>
+	<bean name="/mtab.htm" class="springapp.web.MultiLevelTabFormController">
+		
+	</bean>
 </beans>
