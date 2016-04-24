@@ -17,4 +17,18 @@ public class StudentManagerService implements StudentManager {
 		return studentDao.getStudentList();
 	}
 
+	public void saveStudentInfo(StudentInfo studentInfo) {
+		Student student = new Student();
+		student.setRollNumber(studentInfo.getRollNumber());
+		student.setName(studentInfo.getStudentName());
+		student.setAge(studentInfo.getAge());
+		//TODO: To check if single char is supplied. F-Female, M-Male.
+		student.setSex(studentInfo.getSex().charAt(0));
+		student.setGrade(studentInfo.getGrade());
+		student.setCountry(studentInfo.getCountry());
+		
+		studentDao.saveStudent(student);
+		
+	}
+
 }

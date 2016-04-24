@@ -32,5 +32,7 @@ public class StudentListFormController implements Controller {
         myModel.put("studentList", this.studentManager.getStudentList());
         return new ModelAndView("studentlist", "model", myModel);
     }
+    
+    
 
 }
