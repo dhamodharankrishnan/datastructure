@@ -7,7 +7,8 @@ public class Student {
 	private String name;
 	private Integer age;
 	private char sex;
-
+	private String grade;
+	private String country;
 	
 	public Integer getRollNumber() {
 		return rollNumber;
@@ -32,6 +33,18 @@ public class Student {
 	}
 	public void setSex(char sex) {
 		this.sex = sex;
+	}
+	public String getGrade() {
+		return grade;
+	}
+	public void setGrade(String grade) {
+		this.grade = grade;
+	}
+	public String getCountry() {
+		return country;
+	}
+	public void setCountry(String country) {
+		this.country = country;
 	}
 
 }

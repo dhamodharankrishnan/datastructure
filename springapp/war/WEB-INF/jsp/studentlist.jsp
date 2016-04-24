@@ -18,6 +18,8 @@
 				<TH>Name</TH>
 				<TH>Age</TH>
 				<TH>Sex</TH>
+				<TH>Grade</TH>
+				<TH>Country</TH>
 			</TR>
 			<c:forEach items="${model.studentList}" var="student">
 				<TR>
@@ -25,9 +27,12 @@
 					<TD> <c:out value="${student.name}" /> </TD>
 					<TD> <c:out value="${student.age}" /> </TD>
 					<TD> <c:out value="${student.sex}" /> </TD>
+					<TD> <c:out value="${student.grade}" /> </TD>
+					<TD> <c:out value="${student.country}" /> </TD>
 				</TR>
 			</c:forEach>
 		</TABLE>
+		<a href="<c:url value="studentinfo.htm"/>">Add Student</a>
 </body>
 
 </html> 

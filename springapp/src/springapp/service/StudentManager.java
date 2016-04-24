@@ -14,5 +14,7 @@ import springapp.domain.Student;
 public interface StudentManager {
 	
 	public List<Student> getStudentList();
+	
+	public void saveStudentInfo(StudentInfo studInfo);
 
 }

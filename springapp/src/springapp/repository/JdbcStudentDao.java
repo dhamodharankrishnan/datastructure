@@ -6,6 +6,7 @@ import java.util.List;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.springframework.jdbc.core.namedparam.MapSqlParameterSource;
 import org.springframework.jdbc.core.simple.ParameterizedRowMapper;
 import org.springframework.jdbc.core.simple.SimpleJdbcDaoSupport;
 
@@ -33,6 +34,8 @@ public class JdbcStudentDao extends SimpleJdbcDaoSupport implements StudentDao {
 			student.setName(resultSet.getString("NAME"));
 			student.setAge(resultSet.getInt("AGE"));
 			student.setSex(resultSet.getString("SEX").charAt(0));
+			student.setGrade(resultSet.getString("GRADE"));
+			student.setCountry(resultSet.getString("COUNTRY"));
 			return student;
 		}
 
@@ -42,9 +45,25 @@ public class JdbcStudentDao extends SimpleJdbcDaoSupport implements StudentDao {
 		logger.info("Getting Students");
 
 		List<Student> studentList = getSimpleJdbcTemplate().query(
-				"SELECT ROLLNUM, NAME, AGE, SEX FROM STUDENT_INFO",
+				"SELECT ROLLNUM, NAME, AGE, SEX,GRADE,COUNTRY FROM STUDENT_INFO",
 				new StudentMapper());
 		return studentList;
+	}
+
+	public void saveStudent(Student student) {
+		
+		logger.info("Saving Student:"+student.getName());
+		MapSqlParameterSource mapSqlParameterSource = new MapSqlParameterSource();
+		mapSqlParameterSource.addValue("rollNumber", student.getRollNumber());
+		mapSqlParameterSource.addValue("studName", student.getName());
+		mapSqlParameterSource.addValue("age", student.getAge());
+		mapSqlParameterSource.addValue("sex", student.getSex());
+		mapSqlParameterSource.addValue("grade", student.getGrade());
+		mapSqlParameterSource.addValue("country", student.getCountry());
+
+		int updCount = getSimpleJdbcTemplate().update("INSERT INTO STUDENT_INFO VALUES(:rollNumber, :studName, :age, :sex, :grade, :country)",mapSqlParameterSource);
+
+		logger.info("Rows affected :"+updCount);
 	}
 
 }
