@@ -1,0 +1,58 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<web-app id="WebApp_ID" version="2.4"
+	xmlns="http://java.sun.com/xml/ns/j2ee" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://java.sun.com/xml/ns/j2ee http://java.sun.com/xml/ns/j2ee/web-app_2_4.xsd">
+	<display-name>sampleweb</display-name>
+	<welcome-file-list>
+		<welcome-file>index.jsp</welcome-file>
+	</welcome-file-list>
+	<servlet>
+		<servlet-name>My First Servlet</servlet-name>
+		<servlet-class>sampleweb.servlet.ExtendServlet</servlet-class>
+		<init-param>
+			<param-name>first-init-param</param-name>
+			<param-value>First Initialization Parameter</param-value>
+		</init-param>
+	</servlet>
+
+	<servlet-mapping>
+		<servlet-name>My First Servlet</servlet-name>
+		<url-pattern>/hello</url-pattern>
+	</servlet-mapping>
+
+	<!-- Student Info -->
+	<servlet>
+		<servlet-name>Student Servlet</servlet-name>
+		<servlet-class>sampleweb.servlet.StudentServlet</servlet-class>
+	</servlet>
+
+	<servlet-mapping>
+		<servlet-name>Student Servlet</servlet-name>
+		<url-pattern>/student</url-pattern>
+	</servlet-mapping>
+
+	<filter>
+		<filter-name>LogFilter</filter-name>
+		<filter-class>sampleweb.servlet.LogFilter</filter-class>
+		<init-param>
+			<param-name>filter-test-param</param-name>
+			<param-value>Filter Initialization Parameter</param-value>
+		</init-param>
+	</filter>
+	<filter>
+		<filter-name>AuthenticationFilter</filter-name>
+		<filter-class>sampleweb.servlet.AuthenticationFilter</filter-class>
+		<init-param>
+			<param-name>auth-test-param</param-name>
+			<param-value>Auth Initialization Paramter</param-value>
+		</init-param>
+	</filter>
+	<filter-mapping>
+		<filter-name>AuthenticationFilter</filter-name>
+		<url-pattern>/*</url-pattern>
+	</filter-mapping>
+	<filter-mapping>
+		<filter-name>LogFilter</filter-name>
+		<url-pattern>/*</url-pattern>
+	</filter-mapping>
+</web-app>
